@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/native';
 import { GlobalStyles } from '../../constants/styles';
 import { getFormattedDate } from '../../util/date';
-import ManageExpense from '../../screens/ManageExpense';
+// import ManageExpenses from '../../screens/ManageExpense';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -48,12 +48,15 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
 });
-function ExpenseItem({ description, date, amount }) {
+function ExpenseItem({
+  id, description, date, amount,
+}) {
   const nav = useNavigation();
-  function expensePressHandler() {
-    nav.navigate('ManageExpenses');
-  }
-  // return <Text>{description}</Text>;
+  const expensePressHandler = () => {
+    nav.navigate('ManageExpenses', {
+      expenseId: id,
+    });
+  };
   return (
     <Pressable
       onPress={expensePressHandler}
@@ -75,10 +78,12 @@ ExpenseItem.defaultProps = {
   description: '',
   amount: 0,
   date: { getFormattedDate },
+  id: '',
 };
 ExpenseItem.propTypes = {
   description: PropTypes.string,
   amount: PropTypes.number,
   date: PropTypes.instanceOf(Date),
+  id: PropTypes.string,
 };
 export default ExpenseItem;
