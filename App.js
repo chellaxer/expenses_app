@@ -8,17 +8,30 @@ import ManageExpense from './screens/ManageExpense';
 import RecentExpenses from './screens/RecentExpenses';
 import AllExpenses from './screens/AllExpenses';
 import { GlobalStyles } from './constants/styles';
+import IconButton from './components/UI/IconButton';
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 function ExpensesOverview() {
   return (
-    <BottomTabs.Navigator screenOptions={{
-      headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-      headerTintColor: 'white',
-      tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-      tabBarActiveTintColor: GlobalStyles.colors.accent500,
-    }}
+    <BottomTabs.Navigator
+      screenOptions={({ navigation }) => ({
+        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
+        headerTintColor: 'white',
+        tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
+        tabBarActiveTintColor: GlobalStyles.colors.accent500,
+        /* eslint-disable-next-line */
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon="add"
+            size={24}
+            color={tintColor}
+            onPress={() => {
+              navigation.navigate('ManageExpenses');
+            }}
+          />
+        ),
+      })}
     >
       <BottomTabs.Screen
         name="RecentExpenses"
@@ -26,6 +39,7 @@ function ExpensesOverview() {
         options={{
           title: 'Recent Expenses',
           tabBarLabel: 'Recent',
+          /* eslint-disable-next-line */
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="hourglass" size={size} color={color} />
           ),
@@ -37,6 +51,7 @@ function ExpensesOverview() {
         options={{
           title: 'All Expenses',
           tabBarLabel: 'All Expenses',
+          /* eslint-disable-next-line */
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
           ),
