@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { GlobalStyles } from '../../constants/styles';
+import { getFormattedDate } from '../../util/date';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -35,6 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
+    minWidth: 80,
   },
   amount: {
     color: GlobalStyles.colors.primary500,
@@ -51,7 +53,7 @@ function ExpenseItem({ description, date, amount }) {
       <View style={styles.expenseItem}>
         <View>
           <Text style={[styles.textBase, styles.description]}>{description}</Text>
-          <Text style={styles.textBase}>{date}</Text>
+          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
         </View>
         <View style={styles.amountContainer}>
           <Text>{amount}</Text>
@@ -63,11 +65,11 @@ function ExpenseItem({ description, date, amount }) {
 ExpenseItem.defaultProps = {
   description: '',
   amount: 0,
-  date: '',
+  date: { getFormattedDate },
 };
 ExpenseItem.propTypes = {
   description: PropTypes.string,
   amount: PropTypes.number,
-  date: PropTypes.string,
+  date: PropTypes.instanceOf(Date),
 };
 export default ExpenseItem;
