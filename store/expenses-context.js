@@ -79,7 +79,9 @@ function expensesReducer(state, action) {
       return updatedExpenses;
     }
     case 'DELETE': {
-      return state.filter((expense) => expense.id !== action.payload.id);
+      const id = action.payload;
+      console.log(`[expensesReducer] DELETE  id: ${id}`);
+      return state.filter((expense) => expense.id !== id);
     }
     default:
       return state;
@@ -91,7 +93,8 @@ function ExpensesContextProvider({ children }) {
   function addExpenseItem(expenseData) {
     dispatch({ type: 'ADD', payload: expenseData });
   }
-  function deleteExpenseItem(expenseData) {
+  function deleteExpenseItem(id) {
+    // console.log(`[ExpensesContextProvider][deleteExpenseItem]  id: ${id}`);
     dispatch({ type: 'DELETE', payload: id });
   }
   function updateExpenseItem(expenseData) {
