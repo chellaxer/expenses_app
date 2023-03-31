@@ -10,7 +10,7 @@ function RecentExpenses() {
     const dateMinus7Days = getDateMinusDays(today, 7);
     return expense.date >= dateMinus7Days;
   });
-  console.log(`[RecentExpenses] recentExpenses: ${JSON.stringify(RecentExpenses)}`);
+  console.log(`[RecentExpenses] recentExpenses: ${JSON.stringify(recentExpenses)}`);
   return (
     <ExpensesOutput
       expenses={recentExpenses}

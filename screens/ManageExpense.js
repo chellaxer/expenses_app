@@ -1,14 +1,32 @@
 import {
   View,
   StyleSheet,
+  Text,
 } from 'react-native';
-import { useLayoutEffect } from 'react';
+import { useContext, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '../components/UI/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import GenButton from '../components/UI/GenButton';
+import { ExpensesContext } from '../store/expenses-context';
 
 const styles = StyleSheet.create({
+  expenseItem: {
+    alignItems: 'flex-start',
+    backgroundColor: GlobalStyles.colors.primary500,
+    padding: 14,
+    minWidth: 30,
+    minHeight: 30,
+    marginHorizontal: 12,
+    marginBottom: 22,
+    borderRadius: 8,
+    borderWidth: 3,
+    borderColor: GlobalStyles.colors.primary200,
+  },
+  expenseText: {
+    color: 'white',
+    margin: 2,
+  },
   container: {
     flex: 1,
     padding: 24,
@@ -33,14 +51,20 @@ const styles = StyleSheet.create({
   },
 });
 function ManageExpenses({ route, navigation }) {
-  const editedExpenseId = route.params?.expenseId;
-  const isEditing = !!editedExpenseId;
+  const {
+    id, description, date, amount,
+  } = route.params;
+  console.log(`[ManageExpenses] id: ${id}`);
+  const expenseCtx = useContext(ExpensesContext);
+  // const editedExpenseId = route.params?.expenseId;
+  const isEditing = !!id;
   useLayoutEffect(() => navigation.setOptions({
     title: isEditing ? 'Edit Expense' : 'Add Expense',
   }), [navigation, isEditing]);
 
   const deleteExpenseHandler = () => {
-    console.log('[ManageExpenses] deleteExpenseHandler... ');
+    expenseCtx.deleteExpense(id);
+    navigation.goBack();
   };
   const cancelHandler = () => {
     console.log('[ManageExpenses] cancelHandler... ');
@@ -52,6 +76,22 @@ function ManageExpenses({ route, navigation }) {
   };
   return (
     <View style={styles.container}>
+      <View style={styles.expenseItem}>
+        <Text style={styles.expenseText}>
+          Item:
+          {' '}
+          {description}
+        </Text>
+        <Text style={styles.expenseText}>
+          Purchased:
+          {' '}
+          {date}
+        </Text>
+        <Text style={styles.expenseText}>
+          Amount: $
+          {amount}
+        </Text>
+      </View>
       <View style={styles.buttons}>
         <GenButton
           mode="flat"

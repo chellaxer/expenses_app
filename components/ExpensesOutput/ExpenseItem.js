@@ -54,7 +54,10 @@ function ExpenseItem({
   const nav = useNavigation();
   const expensePressHandler = () => {
     nav.navigate('ManageExpenses', {
-      expenseId: id,
+      id,
+      description,
+      date: getFormattedDate(date),
+      amount,
     });
   };
   return (
@@ -64,6 +67,7 @@ function ExpenseItem({
     >
       <View style={styles.expenseItem}>
         <View>
+          <Text style={[styles.textBase, styles.description]}>{id}</Text>
           <Text style={[styles.textBase, styles.description]}>{description}</Text>
           <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
         </View>
