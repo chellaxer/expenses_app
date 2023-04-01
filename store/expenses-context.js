@@ -53,24 +53,27 @@ const DUMMY_EXPENSES = [
 
 export const ExpensesContext = createContext({
   expenses: [],
+  /* eslint-disable */
   addExpense: ({ description, amount, date }) => {},
   deleteExpense: (id) => {},
   updateExpense: (id, { description, amount, date }) => {},
+  /* eslint-enable */
 });
 
 function expensesReducer(state, action) {
   switch (action.type) {
     case 'ADD': {
-      const newId = new Date().toString() + Math.random().toString();
-      return [{ ...action.payload, id: newId }, ...state];
+      const { id } = action.payload;
+      const newExpense = { ...action.payload.data, id };
+      return [{ ...newExpense }, ...state];
     }
     case 'UPDATE': {
       const updatableExpenseIndex = state.findIndex(
         (expense) => expense.id === action.payload.id,
       );
-      // find the immutable expense-item by its index...
+      // find the expense-item by its index...
       const updatableExpense = state[updatableExpenseIndex];
-      // generate an expense-item copy from the original immutable expense-item...
+      // generate an expense-item copy from the original...
       const updatedItem = { ...updatableExpense, ...action.payload.data };
       // create an expense-list copy thereby maintaining the original lists' immutability...
       const updatedExpenses = [...state];
@@ -80,7 +83,6 @@ function expensesReducer(state, action) {
     }
     case 'DELETE': {
       const id = action.payload;
-      console.log(`[expensesReducer] DELETE  id: ${id}`);
       return state.filter((expense) => expense.id !== id);
     }
     default:
@@ -97,16 +99,30 @@ function ExpensesContextProvider({ children }) {
     // console.log(`[ExpensesContextProvider][deleteExpenseItem]  id: ${id}`);
     dispatch({ type: 'DELETE', payload: id });
   }
-  function updateExpenseItem(expenseData) {
-    dispatch({ type: 'UPDATE', payload: { id, data: expenseData } });
+  function updateExpenseItem(id, expenseData) {
+    console.log(`[ExpensesContextProvider][updateExpenseItem] id: ${id} expenseData: ${JSON.stringify(expenseData)}`);
+    dispatch({
+      type: 'UPDATE',
+      payload: {
+        id,
+        data: expenseData.data,
+      },
+    });
   }
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
   const value = {
     expenses: expensesState,
     addExpense: addExpenseItem,
     deleteExpense: deleteExpenseItem,
     updateExpense: updateExpenseItem,
   };
-  return <ExpensesContext.Provider value={value}>{children}</ExpensesContext.Provider>;
+  return (
+    <ExpensesContext.Provider
+      value={value}
+    >
+      {children}
+    </ExpensesContext.Provider>
+  );
 }
 
 export default ExpensesContextProvider;

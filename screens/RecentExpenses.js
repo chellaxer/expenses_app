@@ -1,16 +1,19 @@
 import { useContext } from 'react';
 import ExpensesOutput from '../components/ExpensesOutput/ExpensesOutput';
 import { ExpensesContext } from '../store/expenses-context';
-import { getDateMinusDays, getFormattedDate } from '../util/date';
+import { getDateMinusDays } from '../util/date';
 
 function RecentExpenses() {
   const expensesCtx = useContext(ExpensesContext);
-  const recentExpenses = expensesCtx.expenses.filter((expense) => {
+  const { expenses } = expensesCtx;
+  const recentExpenses = expenses.filter((expense) => {
     const today = new Date();
     const dateMinus7Days = getDateMinusDays(today, 7);
-    return expense.date >= dateMinus7Days;
+    return (
+      (expense.date >= dateMinus7Days)
+      && (expense.date <= today)
+    );
   });
-  console.log(`[RecentExpenses] recentExpenses: ${JSON.stringify(recentExpenses)}`);
   return (
     <ExpensesOutput
       expenses={recentExpenses}
@@ -22,6 +25,7 @@ RecentExpenses.defaultProps = {
   expenses: () => {},
 };
 RecentExpenses.propTypes = {
+  /* eslint-disable-next-line */
   expenses: () => {},
 };
 

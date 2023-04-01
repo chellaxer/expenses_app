@@ -13,7 +13,7 @@ function renderExpenseItem(data) {
   );
 }
 function ExpensesList({ expenses }) {
-  console.log(`[ExpensesList] ${JSON.stringify(expenses)}`);
+  // console.log(`[ExpensesList] ${JSON.stringify(expenses)}`);
   return (
     <FlatList
       data={expenses}

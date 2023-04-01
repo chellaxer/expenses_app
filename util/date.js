@@ -9,3 +9,7 @@ export function getDateMinusDays(date, days) {
     (date.getDate() - days),
   );
 }
+
+export function getDateToday() {
+  return new Date().toISOString().slice(0, 10);
+}
