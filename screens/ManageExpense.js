@@ -5,10 +5,13 @@ import {
 } from 'react-native';
 import { useContext, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
+import { TextInput } from 'react-native-web';
 import IconButton from '../components/UI/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import GenButton from '../components/UI/GenButton';
 import { ExpensesContext } from '../store/expenses-context';
+import { getDateMinusDays, getFormattedDate } from '../util/date';
+import ExpenseForm from '../components/ManageExpense/ExpenseForm';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -51,47 +54,60 @@ const styles = StyleSheet.create({
   },
 });
 function ManageExpenses({ route, navigation }) {
-  const {
-    id, description, date, amount,
-  } = route.params;
+  const id = route.params?.id ?? '';
+  const description = route.params?.description ?? '';
+  const date = route.params?.date ?? '';
+  const amount = route.params?.amount ?? '';
   console.log(`[ManageExpenses] id: ${id}`);
   const expenseCtx = useContext(ExpensesContext);
   // const editedExpenseId = route.params?.expenseId;
   const isEditing = !!id;
+  console.log(`[ManageExpenses] confirmHandler isEditing: ${isEditing}... `);
   useLayoutEffect(() => navigation.setOptions({
     title: isEditing ? 'Edit Expense' : 'Add Expense',
   }), [navigation, isEditing]);
 
   const deleteExpenseHandler = () => {
+    // eslint-disable-next-line react/destructuring-assignment
     expenseCtx.deleteExpense(id);
     navigation.goBack();
   };
   const cancelHandler = () => {
-    console.log('[ManageExpenses] cancelHandler... ');
+    // console.log('[ManageExpenses] cancelHandler... ');
     navigation.goBack();
   };
   const confirmHandler = () => {
-    console.log('[ManageExpenses] confirmHandler... ');
+    // console.log('[ManageExpenses] confirmHandler... ');
+    const today = new Date();
+    // const dateMinus1Days = getFormattedDate(getDateMinusDays(today, 1));
+    const dateMinus1Days = getDateMinusDays(today, 1);
+    if (isEditing) {
+      // eslint-disable-next-line react/destructuring-assignment
+      expenseCtx.updateExpense(
+        id,
+        {
+          data: {
+            description: 'TEST UPDATE',
+            amount: 19.99,
+            date: dateMinus1Days,
+          },
+        },
+      );
+    } else {
+      expenseCtx.addExpense({
+        id: `e${Math.random().toFixed(2) * 100}`,
+        data: {
+          description: 'TEST ADD',
+          amount: 23.99,
+          date: dateMinus1Days,
+        },
+      });
+    }
     navigation.goBack();
   };
   return (
     <View style={styles.container}>
-      <View style={styles.expenseItem}>
-        <Text style={styles.expenseText}>
-          Item:
-          {' '}
-          {description}
-        </Text>
-        <Text style={styles.expenseText}>
-          Purchased:
-          {' '}
-          {date}
-        </Text>
-        <Text style={styles.expenseText}>
-          Amount: $
-          {amount}
-        </Text>
-      </View>
+      <ExpenseForm />
       <View style={styles.buttons}>
         <GenButton
           mode="flat"
@@ -129,7 +145,10 @@ ManageExpenses.defaultProps = {
 ManageExpenses.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
-      expenseId: PropTypes.string,
+      id: PropTypes.string,
+      description: PropTypes.string,
+      date: PropTypes.string,
+      amount: PropTypes.number,
     }),
   }),
   navigation: () => {},

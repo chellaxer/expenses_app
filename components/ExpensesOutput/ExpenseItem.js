@@ -7,7 +7,9 @@ import {
 import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/native';
 import { GlobalStyles } from '../../constants/styles';
-import { getFormattedDate } from '../../util/date';
+import {
+  getFormattedDate,
+} from '../../util/date';
 // import ManageExpenses from '../../screens/ManageExpense';
 
 const styles = StyleSheet.create({
@@ -67,9 +69,15 @@ function ExpenseItem({
     >
       <View style={styles.expenseItem}>
         <View>
-          <Text style={[styles.textBase, styles.description]}>{id}</Text>
+          <Text style={[styles.textBase, styles.description]}>
+            ID:
+            {id}
+          </Text>
           <Text style={[styles.textBase, styles.description]}>{description}</Text>
-          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
+          <Text style={styles.textBase}>
+            DATE:
+            {getFormattedDate(date)}
+          </Text>
         </View>
         <View style={styles.amountContainer}>
           <Text>{amount}</Text>
@@ -81,7 +89,7 @@ function ExpenseItem({
 ExpenseItem.defaultProps = {
   description: '',
   amount: 0,
-  date: { getFormattedDate },
+  date: new Date(),
   id: '',
 };
 ExpenseItem.propTypes = {
