@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     backgroundColor: GlobalStyles.colors.primary800,
   },
   deleteContainer: {
-    marginTop: 2,
     paddingTop: 8,
     borderWidth: 2,
     borderTopColor: GlobalStyles.colors.primary200,

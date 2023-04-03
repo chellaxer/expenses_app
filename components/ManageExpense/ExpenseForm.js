@@ -2,13 +2,15 @@ import {
   View,
   StyleSheet,
   Text,
-  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Input from './Input';
 import GenButton from '../UI/GenButton';
 import { getFormattedDate } from '../../util/date';
+import { GlobalStyles } from '../../constants/styles';
 
 const styles = StyleSheet.create({
   inputsRow: {
@@ -21,7 +23,7 @@ const styles = StyleSheet.create({
   form: {
     padding: 10,
     marginTop: 40,
-    marginBottom: 110,
+    marginBottom: 30,
   },
   title: {
     fontSize: 24,
@@ -30,15 +32,21 @@ const styles = StyleSheet.create({
     marginVertical: 24,
     textAlign: 'center',
   },
+  errorText: {
+    textAlign: 'center',
+    color: GlobalStyles.colors.error500,
+    margin: 8,
+  },
   buttons: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 120,
+    alignItems: 'center',
+    marginVertical: 20,
     // padding: 10,
   },
   button: {
-    minWidth: 100,
-    padding: 8,
+    minWidth: 120,
+    marginHorizontal: 8,
   },
 });
 function ExpenseForm({
@@ -47,17 +55,26 @@ function ExpenseForm({
   onSubmit,
   defaultValues,
 }) {
-  const [inputValues, setInputValues] = useState({
-    amount: defaultValues ? defaultValues.amount.toString() : '',
-    date: defaultValues ? getFormattedDate(defaultValues.date) : '',
-    description: defaultValues ? defaultValues.description : '',
+  const [inputs, setInputs] = useState({
+    amount: {
+      value: defaultValues ? defaultValues.amount.toString() : '',
+      isValid: true,
+    },
+    date: {
+      value: defaultValues ? getFormattedDate(defaultValues.date) : '',
+      isValid: true,
+    },
+    description: {
+      value: defaultValues ? defaultValues.description : '',
+      isValid: true,
+    },
   });
   const submitHandler = () => {
     console.log('[ExpenseForm] submitHandler... ');
     const expenseData = {
-      amount: +inputValues.amount,
-      date: new Date(inputValues.date),
-      description: inputValues.description,
+      amount: +inputs.amount.value,
+      date: new Date(inputs.date.value),
+      description: inputs.description.value,
     };
 
     const amountIsValid = !Number.isNaN(expenseData?.amount)
@@ -66,7 +83,21 @@ function ExpenseForm({
     const descriptionIsValid = expenseData?.description.trim().length > 0; // not empty
 
     if (!amountIsValid || !dateIsValid || !descriptionIsValid) {
-      Alert.alert('Invalid Input', 'Please check your input values!');
+      setInputs((currInputs) => ({
+        amount: {
+          value: currInputs.amount.value,
+          isValid: amountIsValid,
+        },
+        date: {
+          value: currInputs.date.value,
+          isValid: dateIsValid,
+        },
+        description: {
+          value: currInputs.description.value,
+          isValid: descriptionIsValid,
+        },
+      }));
+      // Alert.alert('Invalid Input', 'Please check your input values!');
       return;
     }
 
@@ -74,70 +105,80 @@ function ExpenseForm({
   };
   const inputChangedHandler = useCallback((inputIdentifier, enteredValue) => {
     // eslint-disable-next-line max-len
-    setInputValues((currValues) => ({ ...currValues, [inputIdentifier]: enteredValue }));
+    setInputs((currInputs) => (
+      {
+        ...currInputs,
+        [inputIdentifier]: { value: enteredValue, isValid: true },
+      }));
   }, []);
-  /*
-  function inputChangedHandler(inputIdentifier, enteredValue) {
-    // eslint-disable-next-line max-len
-    console.log(`[inputChangedHandler] identifier: ${inputIdentifier}, ${enteredValue}`);
-    setInputValues((currValues) => ({ ...currValues, [inputIdentifier]: enteredValue }));
-    console.log(`[inputChangedHandler] inputValues: ${JSON.stringify(inputValues)}`);
-  }
-   */
   useEffect(() => {
+    // eslint-disable-next-line no-unused-expressions
     inputChangedHandler;
-  }, [inputValues, inputChangedHandler]);
+  });
+  const invalidForm = !inputs.amount.isValid || !inputs.date.isValid || !inputs.description.isValid;
   return (
-    <View style={styles.form}>
-      <Text style={styles.title}>Your Expense:</Text>
-      <View style={styles.inputsRow}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.form}>
+        <Text style={styles.title}>Your Expense:</Text>
+        <View style={styles.inputsRow}>
+          <Input
+            invalid={!inputs.amount.isValid}
+            style={styles.rowInput}
+            label="Amount"
+            textInputConfig={{
+              keyboardType: 'decimal-pad',
+              onChangeText: (amt) => inputChangedHandler('amount', amt),
+              value: inputs.amount.value,
+            }}
+          />
+          <Input
+            invalid={!inputs.date.isValid}
+            style={styles.rowInput}
+            label="Date"
+            textInputConfig={{
+              placeholder: 'YYYY-MM-DD',
+              // keyboardType: 'decimal-pad',
+              onChangeText: (date) => inputChangedHandler('date', date),
+              value: inputs.date.value,
+            }}
+          />
+        </View>
         <Input
-          style={styles.rowInput}
-          label="Amount"
+          invalid={!inputs.description.isValid}
+          label="Description"
           textInputConfig={{
-            keyboardType: 'decimal-pad',
-            onChangeText: (amt) => inputChangedHandler('amount', amt),
-            value: inputValues.amount,
-          }}
-        />
-        <Input
-          style={styles.rowInput}
-          label="Date"
-          textInputConfig={{
-            placeholder: 'YYYY-MM-DD',
+            multiline: true,
             maxLength: 10,
-            onChangeText: inputChangedHandler.bind(this, 'description'),
-            value: inputValues.date,
+            onChangeText: (desc) => inputChangedHandler('description', desc),
+            value: inputs.description.value,
           }}
         />
+        {
+        invalidForm && (
+          <Text
+            style={styles.errorText}
+          >
+            Invalid input value - please check entered values!
+          </Text>
+        )
+      }
+        <View style={styles.buttons}>
+          <GenButton
+            mode="flat"
+            onPress={onCancel}
+            style={styles.button}
+          >
+            Cancel
+          </GenButton>
+          <GenButton
+            onPress={submitHandler}
+            style={styles.button}
+          >
+            {submitButtonLabel}
+          </GenButton>
+        </View>
       </View>
-      <Input
-        label="Description"
-        textInputConfig={{
-          multiline: true,
-          // autoCorrect: True,
-          // autoCapitalize: 'characters',
-          maxLength: 10,
-          onChangeText: inputChangedHandler.bind(this, 'description'),
-          value: inputValues.description,
-        }}
-      />
-      <View style={styles.buttons}>
-        <GenButton
-          mode="flat"
-          onPress={onCancel}
-          style={styles.button}
-        >
-          Cancel
-        </GenButton>
-        <GenButton
-          onPress={submitHandler}
-          style={styles.button}
-        >
-          {submitButtonLabel}
-        </GenButton>
-      </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 ExpenseForm.defaultProps = {

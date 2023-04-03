@@ -10,7 +10,7 @@ import { GlobalStyles } from '../../constants/styles';
 
 const styles = StyleSheet.create({
   inputContainer: {
-    flex: 1,
+    // flex: 1,
     marginHorizontal: 4,
     marginVertical: 8,
   },
@@ -30,8 +30,16 @@ const styles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: 'top',
   },
+  invalidLabel: {
+    color: GlobalStyles.colors.error500,
+  },
+  invalidInput: {
+    backgroundColor: GlobalStyles.colors.error50,
+  },
 });
-function Input({ label, textInputConfig, style }) {
+function Input({
+  label, invalid, textInputConfig, style,
+}) {
   let inputStyles;
   // eslint-disable-next-line prefer-const
   inputStyles = [styles.input];
@@ -39,9 +47,12 @@ function Input({ label, textInputConfig, style }) {
     /* eslint-disable-next-line */
     inputStyles.push(styles.inputMultiLine);
   }
+  if (invalid) {
+    inputStyles.push(styles.invalidInput);
+  }
   return (
     <View style={[styles.inputContainer, style]}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, invalid && styles.invalidLabel]}>{label}</Text>
       <TextInput style={inputStyles} {...textInputConfig} />
     </View>
   );
