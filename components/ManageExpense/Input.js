@@ -5,10 +5,12 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
+import PropTypes from 'prop-types';
 import { GlobalStyles } from '../../constants/styles';
 
 const styles = StyleSheet.create({
   inputContainer: {
+    flex: 1,
     marginHorizontal: 4,
     marginVertical: 8,
   },
@@ -29,20 +31,31 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 });
-function Input({ label, textInputConfig }) {
+function Input({ label, textInputConfig, style }) {
   let inputStyles;
+  // eslint-disable-next-line prefer-const
   inputStyles = [styles.input];
   if (textInputConfig && textInputConfig.multiline) {
-    console.log(`[Input] textInputConfig: ${JSON.stringify(textInputConfig)}`);
     /* eslint-disable-next-line */
     inputStyles.push(styles.inputMultiLine);
   }
   return (
-    <View style={styles.inputContainer}>
+    <View style={[styles.inputContainer, style]}>
       <Text style={styles.label}>{label}</Text>
       <TextInput style={inputStyles} {...textInputConfig} />
     </View>
   );
 }
 
+Input.defaulProps = {
+  label: PropTypes.string,
+  textInputConfig: () => {},
+  style: () => {},
+};
+
+Input.propTypes = {
+  label: PropTypes.string,
+  textInputConfig: () => {},
+  style: () => {},
+};
 export default Input;
