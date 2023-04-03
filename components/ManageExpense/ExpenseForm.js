@@ -2,8 +2,9 @@ import {
   View,
   StyleSheet,
   Text,
+  Alert,
 } from 'react-native';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Input from './Input';
 import GenButton from '../UI/GenButton';
@@ -52,21 +53,40 @@ function ExpenseForm({
     description: defaultValues ? defaultValues.description : '',
   });
   const submitHandler = () => {
-    // console.log('[ManageExpenses] confirmHandler... ');
+    console.log('[ExpenseForm] submitHandler... ');
     const expenseData = {
       amount: +inputValues.amount,
       date: new Date(inputValues.date),
       description: inputValues.description,
     };
+
+    const amountIsValid = !Number.isNaN(expenseData?.amount)
+      && expenseData?.amount > 0;
+    const dateIsValid = expenseData?.date.toString() !== 'Invalid Date';
+    const descriptionIsValid = expenseData?.description.trim().length > 0; // not empty
+
+    if (!amountIsValid || !dateIsValid || !descriptionIsValid) {
+      Alert.alert('Invalid Input', 'Please check your input values!');
+      return;
+    }
+
     onSubmit(expenseData);
   };
-  const inputChangedHandler = (inputIdentifier, enteredValue) => {
-    setInputValues((currentInputValues) => ({
-      ...currentInputValues,
-      // dynamically target input values...
-      [inputIdentifier]: enteredValue,
-    }));
-  };
+  const inputChangedHandler = useCallback((inputIdentifier, enteredValue) => {
+    // eslint-disable-next-line max-len
+    setInputValues((currValues) => ({ ...currValues, [inputIdentifier]: enteredValue }));
+  }, []);
+  /*
+  function inputChangedHandler(inputIdentifier, enteredValue) {
+    // eslint-disable-next-line max-len
+    console.log(`[inputChangedHandler] identifier: ${inputIdentifier}, ${enteredValue}`);
+    setInputValues((currValues) => ({ ...currValues, [inputIdentifier]: enteredValue }));
+    console.log(`[inputChangedHandler] inputValues: ${JSON.stringify(inputValues)}`);
+  }
+   */
+  useEffect(() => {
+    inputChangedHandler;
+  }, [inputValues, inputChangedHandler]);
   return (
     <View style={styles.form}>
       <Text style={styles.title}>Your Expense:</Text>
@@ -76,7 +96,7 @@ function ExpenseForm({
           label="Amount"
           textInputConfig={{
             keyboardType: 'decimal-pad',
-            onChangeText: inputChangedHandler.bind(this, 'amount'),
+            onChangeText: (amt) => inputChangedHandler('amount', amt),
             value: inputValues.amount,
           }}
         />

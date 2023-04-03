@@ -49,13 +49,13 @@ function Input({ label, textInputConfig, style }) {
 
 Input.defaulProps = {
   label: PropTypes.string,
-  textInputConfig: () => {},
+  // textInputConfig: () => {},
   style: () => {},
 };
 
 Input.propTypes = {
   label: PropTypes.string,
-  textInputConfig: () => {},
+  // textInputConfig: () => {},
   style: () => {},
 };
 export default Input;

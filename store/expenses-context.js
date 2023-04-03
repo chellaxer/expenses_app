@@ -79,6 +79,7 @@ function expensesReducer(state, action) {
       const updatedExpenses = [...state];
       // ...and update the expense-item by index in the expense-list copy.
       updatedExpenses[updatableExpenseIndex] = updatedItem;
+      console.log(`[ExpensesContextProvider] [expensesReducer] updatedItem: ${JSON.stringify(updatedItem)}`);
       return updatedExpenses;
     }
     case 'DELETE': {
@@ -105,7 +106,7 @@ function ExpensesContextProvider({ children }) {
       type: 'UPDATE',
       payload: {
         id,
-        data: expenseData.data,
+        data: expenseData,
       },
     });
   }
