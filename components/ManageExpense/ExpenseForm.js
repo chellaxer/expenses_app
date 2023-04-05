@@ -70,7 +70,7 @@ function ExpenseForm({
     },
   });
   const submitHandler = () => {
-    console.log('[ExpenseForm] submitHandler... ');
+    // console.log('[ExpenseForm] submitHandler... ');
     const expenseData = {
       amount: +inputs.amount.value,
       date: new Date(inputs.date.value),
@@ -148,7 +148,7 @@ function ExpenseForm({
           label="Description"
           textInputConfig={{
             multiline: true,
-            maxLength: 10,
+            maxLength: 120,
             onChangeText: (desc) => inputChangedHandler('description', desc),
             value: inputs.description.value,
           }}

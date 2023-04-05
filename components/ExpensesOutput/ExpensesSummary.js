@@ -26,13 +26,17 @@ const styles = StyleSheet.create({
   },
 });
 function ExpensesSummary({ expenses, periodName }) {
-  const expensesSum = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  let expensesSum;
+  // console.log(`[ExpensesSummary] expenses: ${JSON.stringify(expenses)}`);
+  if (expenses && Array.isArray(expenses?.data) && expenses?.data.length > 0) {
+    expensesSum = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.period}>{periodName}</Text>
       <Text style={styles.sum}>
         $
-        {expensesSum.toFixed(2)}
+        {expensesSum && expensesSum.toFixed(2)}
       </Text>
     </View>
   );
