@@ -8,6 +8,7 @@ import IconButton from '../components/UI/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpense/ExpenseForm';
+import { storeExpense } from '../util/http';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -52,15 +53,14 @@ function ManageExpenses({ route, navigation }) {
   }), [navigation, isEditing]);
   const confirmHandler = (expenseData) => {
     if (isEditing) {
+      // eslint-disable-next-line react/destructuring-assignment
       expenseCtx.updateExpense(editingExpenseId, expenseData);
     } else {
-      expenseCtx.addExpense({
-        id: `e${Math.random().toFixed(2) * 100}`,
-        // eslint-disable-next-line react/destructuring-assignment
-        data: { ...expenseData },
-      });
+      storeExpense(expenseData);
+      // eslint-disable-next-line react/destructuring-assignment
+      expenseCtx.addExpense(expenseData);
+      navigation.goBack();
     }
-    navigation.goBack();
   };
 
   const deleteExpenseHandler = () => {

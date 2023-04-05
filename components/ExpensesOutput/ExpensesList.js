@@ -1,10 +1,7 @@
 import {
   FlatList,
-  StyleSheet,
-  View,
 } from 'react-native';
 import ExpenseItem from './ExpenseItem';
-import { GlobalStyles } from '../../constants/styles';
 
 function renderExpenseItem(data) {
   return (

@@ -1,21 +1,34 @@
-import { useContext } from 'react';
+import {
+  useContext,
+  useEffect,
+} from 'react';
 import ExpensesOutput from '../components/ExpensesOutput/ExpensesOutput';
 import { ExpensesContext } from '../store/expenses-context';
 import { getDateMinusDays } from '../util/date';
+import { fetchExpenses } from '../util/http';
 
 function RecentExpenses() {
-  const expensesCtx = useContext(ExpensesContext);
-  const { expenses } = expensesCtx;
+  const { expenses, setExpenses } = useContext(ExpensesContext);
+  useEffect(() => {
+    async function getExpenses() {
+      const fetchedExpenses = await fetchExpenses();
+      setExpenses(fetchedExpenses);
+    }
+    getExpenses().catch((err) => console.log(`[RecentExpenses] [getExpenses] error: ${err.message}`));
+  }, []);
+  // console.log(`[RecentExpenses] POST useEffect expenses: ${JSON.stringify(expenses)}`);
+
   const recentExpenses = expenses.filter((expense) => {
     const today = new Date();
     const dateMinus7Days = getDateMinusDays(today, 7);
     return (
       (expense.date >= dateMinus7Days)
-      && (expense.date <= today)
+        && (expense.date <= today)
     );
   });
   return (
     <ExpensesOutput
+      // expenses={fetchedExpenses}
       expenses={recentExpenses}
       expensesPeriod="Last 7 Days"
     />

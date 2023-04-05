@@ -1,71 +1,27 @@
 import { createContext, useReducer } from 'react';
 
-const DUMMY_EXPENSES = [
-  {
-    id: 'e1',
-    description: 'Nike shoes',
-    amount: 59.99,
-    date: new Date('2023-12-19'),
-  },
-  {
-    id: 'e2',
-    description: 'Polo Slacks',
-    amount: 89.99,
-    date: new Date('2023-01-05'),
-  },
-  {
-    id: 'e3',
-    description: 'Grocery',
-    amount: 6.99,
-    date: new Date('2023-02-05'),
-  },
-  {
-    id: 'e4',
-    description: 'Moby Dick Novel',
-    amount: 14.95,
-    date: new Date('2023-03-19'),
-  },
-  {
-    id: 'e5',
-    description: 'How to Garden book',
-    amount: 18.95,
-    date: new Date('2023-03-28'),
-  },
-  {
-    id: 'e6',
-    description: 'Dress3Shoe',
-    amount: 200.95,
-    date: new Date('2023-03-25'),
-  },
-  {
-    id: 'e7',
-    description: 'Motorcycle Helmet',
-    amount: 650.93,
-    date: new Date('2022-03-20'),
-  },
-  {
-    id: 'e8',
-    description: 'Motorcycle Jacket',
-    amount: 551.26,
-    date: new Date('2023-03-02'),
-  },
-];
-
 export const ExpensesContext = createContext({
   expenses: [],
   /* eslint-disable */
   addExpense: ({ description, amount, date }) => {},
   deleteExpense: (id) => {},
   updateExpense: (id, { description, amount, date }) => {},
+  setExpenses: (expenses) => {},
   /* eslint-enable */
 });
 
 function expensesReducer(state, action) {
   switch (action.type) {
     case 'ADD': {
-      const { id } = action.payload;
-      const newExpense = { ...action.payload.data, id };
+      // const id = `e${Math.random().toFixed(2) * 100}`;
+      const id = new Date().toString().slice(0, 10) + Math.random().toFixed(2).toString();
+      // const { id } = action.payload;
+      const newExpense = { ...action.payload, id };
       return [{ ...newExpense }, ...state];
+    }
+    case 'SET': {
+      // console.log(`[expensesReducer] SET ${JSON.stringify(action.payload)}`);
+      return action.payload;
     }
     case 'UPDATE': {
       const updatableExpenseIndex = state.findIndex(
@@ -92,7 +48,10 @@ function expensesReducer(state, action) {
 }
 function ExpensesContextProvider({ children }) {
   // state management logic...
-  const [expensesState, dispatch] = useReducer(expensesReducer, DUMMY_EXPENSES);
+  const [expensesState, dispatch] = useReducer(expensesReducer, []);
+  function setExpenses(expenses) {
+    dispatch({ type: 'SET', payload: expenses });
+  }
   function addExpenseItem(expenseData) {
     dispatch({ type: 'ADD', payload: expenseData });
   }
@@ -113,6 +72,7 @@ function ExpensesContextProvider({ children }) {
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const value = {
     expenses: expensesState,
+    setExpenses,
     addExpense: addExpenseItem,
     deleteExpense: deleteExpenseItem,
     updateExpense: updateExpenseItem,

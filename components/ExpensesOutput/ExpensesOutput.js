@@ -25,7 +25,9 @@ const styles = StyleSheet.create({
 });
 function ExpensesOutput({ expenses, expensesPeriod, fallbackText }) {
   let content = <Text style={styles.infoText}>{fallbackText}</Text>;
-  if (expenses.length > 0) {
+  // console.log(`[ExpensesOutput] expenses: ${JSON.stringify(expenses)}`);
+  if (expenses && Array.isArray(expenses)) {
+  // if (expenses.length > 0) {
     content = (
       <ExpensesList
         expenses={expenses}
