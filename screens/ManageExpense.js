@@ -51,14 +51,15 @@ function ManageExpenses({ route, navigation }) {
   useLayoutEffect(() => navigation.setOptions({
     title: isEditing ? 'Edit Expense' : 'Add Expense',
   }), [navigation, isEditing]);
-  const confirmHandler = (expenseData) => {
+  const confirmHandler = async (expenseData) => {
     if (isEditing) {
       // eslint-disable-next-line react/destructuring-assignment
       expenseCtx.updateExpense(editingExpenseId, expenseData);
     } else {
-      storeExpense(expenseData);
+      const id = await storeExpense(expenseData);
       // eslint-disable-next-line react/destructuring-assignment
-      expenseCtx.addExpense(expenseData);
+      // expenseCtx.addExpense(expenseData);
+      expenseCtx.addExpense({ ...expenseData, id });
       navigation.goBack();
     }
   };
