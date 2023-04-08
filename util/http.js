@@ -10,7 +10,8 @@ export async function storeExpense(expenseData) {
   } catch (err) {
     console.log(`[storeExpense] error: ${err.message}`);
   }
-  return response;
+  // "name === id" in google Firebase.
+  return response.data?.name ?? '';
 }
 export async function fetchExpenses() {
   // const expenses = [];

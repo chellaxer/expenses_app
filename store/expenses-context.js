@@ -3,7 +3,7 @@ import { createContext, useReducer } from 'react';
 export const ExpensesContext = createContext({
   expenses: [],
   /* eslint-disable */
-  addExpense: ({ description, amount, date }) => {},
+  addExpense: ({ description, amount, date, id}) => {},
   deleteExpense: (id) => {},
   updateExpense: (id, { description, amount, date }) => {},
   setExpenses: (expenses) => {},
@@ -14,14 +14,14 @@ function expensesReducer(state, action) {
   switch (action.type) {
     case 'ADD': {
       // const id = `e${Math.random().toFixed(2) * 100}`;
-      const id = new Date().toString().slice(0, 10) + Math.random().toFixed(2).toString();
+      // const id = new Date().toString().slice(0, 10) + Math.random().toFixed(2).toString();
       // const { id } = action.payload;
-      const newExpense = { ...action.payload, id };
-      return [{ ...newExpense }, ...state];
+      // const newExpense = { ...action.payload, id };
+      // return [{ ...newExpense }, ...state];
+      return [action.payload, ...state];
     }
     case 'SET': {
-      // console.log(`[expensesReducer] SET ${JSON.stringify(action.payload)}`);
-      return action.payload;
+      return action.payload.reverse();
     }
     case 'UPDATE': {
       const updatableExpenseIndex = state.findIndex(

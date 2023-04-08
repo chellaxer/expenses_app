@@ -15,6 +15,7 @@ function RecentExpenses() {
       setExpenses(fetchedExpenses);
     }
     getExpenses().catch((err) => console.log(`[RecentExpenses] [getExpenses] error: ${err.message}`));
+    // eslint-disable-next-line
   }, []);
   // console.log(`[RecentExpenses] POST useEffect expenses: ${JSON.stringify(expenses)}`);
 
