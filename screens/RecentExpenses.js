@@ -1,17 +1,22 @@
 import {
   useContext,
   useEffect,
+  useState,
 } from 'react';
 import ExpensesOutput from '../components/ExpensesOutput/ExpensesOutput';
 import { ExpensesContext } from '../store/expenses-context';
 import { getDateMinusDays } from '../util/date';
 import { dbFetch } from '../util/http';
+import LoadingOverlay from '../components/UI/LoadingOverlay';
 
 function RecentExpenses() {
+  const [isFetching, setIsFetching] = useState(true);
   const { expenses, setExpenses } = useContext(ExpensesContext);
   useEffect(() => {
     async function getExpenses() {
+      setIsFetching(true);
       const fetchedExpenses = await dbFetch();
+      setIsFetching(false);
       setExpenses(fetchedExpenses);
     }
     getExpenses().catch((err) => console.log(`[RecentExpenses] [getExpenses] error: ${err.message}`));
@@ -19,6 +24,9 @@ function RecentExpenses() {
   }, []);
   // console.log(`[RecentExpenses] POST useEffect expenses: ${JSON.stringify(expenses)}`);
 
+  if (isFetching) {
+    return <LoadingOverlay />;
+  }
   const recentExpenses = expenses.filter((expense) => {
     const today = new Date();
     const dateMinus7Days = getDateMinusDays(today, 7);
