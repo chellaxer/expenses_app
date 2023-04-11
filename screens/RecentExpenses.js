@@ -8,25 +8,43 @@ import { ExpensesContext } from '../store/expenses-context';
 import { getDateMinusDays } from '../util/date';
 import { dbFetch } from '../util/http';
 import LoadingOverlay from '../components/UI/LoadingOverlay';
+import ErrorOverlay from '../components/UI/ErrorOverlay';
 
 function RecentExpenses() {
   const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState('');
   const { expenses, setExpenses } = useContext(ExpensesContext);
+  const onConfirmHandler = () => {
+    setError(null);
+    setIsFetching(false);
+  };
   useEffect(() => {
     async function getExpenses() {
       setIsFetching(true);
       const fetchedExpenses = await dbFetch();
-      setIsFetching(false);
-      setExpenses(fetchedExpenses);
+      if (fetchedExpenses?.error) {
+        setError(fetchedExpenses.error);
+      } else {
+        setIsFetching(false);
+        setExpenses(fetchedExpenses.data);
+      }
     }
     getExpenses().catch((err) => console.log(`[RecentExpenses] [getExpenses] error: ${err.message}`));
     // eslint-disable-next-line
   }, []);
-  // console.log(`[RecentExpenses] POST useEffect expenses: ${JSON.stringify(expenses)}`);
 
+  if (error) {
+    return (
+      <ErrorOverlay
+        message={error}
+        onConfirm={onConfirmHandler}
+      />
+    );
+  }
   if (isFetching) {
     return <LoadingOverlay />;
   }
+  // console.log(`[RecentExpenses] expenses: ${JSON.stringify(expenses)}`);
   const recentExpenses = expenses.filter((expense) => {
     const today = new Date();
     const dateMinus7Days = getDateMinusDays(today, 7);
