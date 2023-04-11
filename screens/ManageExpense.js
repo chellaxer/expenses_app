@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import {
   useContext,
-  useLayoutEffect,
+  useLayoutEffect, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '../components/UI/IconButton';
@@ -16,6 +16,7 @@ import {
   dbUpdate,
   dbDelete,
 } from '../util/http';
+import LoadingOverlay from '../components/UI/LoadingOverlay';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
   },
 });
 function ManageExpenses({ route, navigation }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const editingExpenseId = route.params?.id ?? '';
   const expenseCtx = useContext(ExpensesContext);
   // console.log(`[ManageExpenses] editingExpenseId: ${editingExpenseId}`);
@@ -64,6 +66,7 @@ function ManageExpenses({ route, navigation }) {
     title: isEditing ? 'Edit Expense' : 'Add Expense',
   }), [navigation, isEditing]);
   const confirmHandler = async (expenseData) => {
+    setIsSubmitting(true);
     if (isEditing) {
       // eslint-disable-next-line react/destructuring-assignment
       updateExpense(editingExpenseId, expenseData);
@@ -74,19 +77,25 @@ function ManageExpenses({ route, navigation }) {
       // expenseCtx.addExpense(expenseData);
       addExpense({ ...expenseData, id });
     }
+    setIsSubmitting(false);
     navigation.goBack();
   };
 
   const deleteExpenseHandler = async () => {
     // eslint-disable-next-line react/destructuring-assignment
+    setIsSubmitting(true);
     deleteExpense(editingExpenseId);
     await dbDelete(editingExpenseId);
+    setIsSubmitting(false);
     navigation.goBack();
   };
   const cancelHandler = () => {
     // console.log('[ManageExpenses] cancelHandler... ');
     navigation.goBack();
   };
+  if (isSubmitting) {
+    return <LoadingOverlay />;
+  }
   return (
     <View style={styles.container}>
       <ExpenseForm
