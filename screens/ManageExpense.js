@@ -2,13 +2,20 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
-import { useContext, useLayoutEffect } from 'react';
+import {
+  useContext,
+  useLayoutEffect,
+} from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '../components/UI/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpense/ExpenseForm';
-import { storeExpense } from '../util/http';
+import {
+  dbStore,
+  dbUpdate,
+  dbDelete,
+} from '../util/http';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -42,8 +49,13 @@ const styles = StyleSheet.create({
 function ManageExpenses({ route, navigation }) {
   const editingExpenseId = route.params?.id ?? '';
   const expenseCtx = useContext(ExpensesContext);
+  // console.log(`[ManageExpenses] editingExpenseId: ${editingExpenseId}`);
+  const {
+    addExpense,
+    deleteExpense,
+    updateExpense,
+  } = useContext(ExpensesContext);
   const isEditing = !!editingExpenseId;
-
   const { expenses } = expenseCtx;
   const selectedExpense = expenses.find(
     (expense) => expense.id === editingExpenseId,
@@ -54,19 +66,21 @@ function ManageExpenses({ route, navigation }) {
   const confirmHandler = async (expenseData) => {
     if (isEditing) {
       // eslint-disable-next-line react/destructuring-assignment
-      expenseCtx.updateExpense(editingExpenseId, expenseData);
+      updateExpense(editingExpenseId, expenseData);
+      await dbUpdate(editingExpenseId, expenseData);
     } else {
-      const id = await storeExpense(expenseData);
+      const id = await dbStore(expenseData);
       // eslint-disable-next-line react/destructuring-assignment
       // expenseCtx.addExpense(expenseData);
-      expenseCtx.addExpense({ ...expenseData, id });
-      navigation.goBack();
+      addExpense({ ...expenseData, id });
     }
+    navigation.goBack();
   };
 
-  const deleteExpenseHandler = () => {
+  const deleteExpenseHandler = async () => {
     // eslint-disable-next-line react/destructuring-assignment
-    expenseCtx.deleteExpense(editingExpenseId);
+    deleteExpense(editingExpenseId);
+    await dbDelete(editingExpenseId);
     navigation.goBack();
   };
   const cancelHandler = () => {
