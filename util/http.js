@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const BACKEND_URL = 'https://rn-course-46ac3-default-rtdb.firebaseio.com';
+// const BACKEND_URL = 'https://rn-course-46ac3-default-rtdb.firebaseio.com';
+const BACKEND_URL = 'https://brainexon-rncourse-default-rtdb.firebaseio.com';
 // export const storeExpense = async (expenseData) => {
-export async function storeExpense(expenseData) {
+export async function dbStore(expenseData) {
   const storeExpensesUrl = `${BACKEND_URL}/expenses.json`;
   let response;
   try {
@@ -13,10 +14,15 @@ export async function storeExpense(expenseData) {
   // "name === id" in google Firebase.
   return response.data?.name ?? '';
 }
-export async function fetchExpenses() {
+export async function dbFetch() {
   // const expenses = [];
   const fetchUrl = `${BACKEND_URL}/expenses.json`;
-  const response = await axios.get(fetchUrl);
+  let response;
+  try {
+    response = await axios.get(fetchUrl);
+  } catch (err) {
+    console.log(`[dbUpdate] error: ${err.message}`);
+  }
   // return response.data;
   return Object.keys(response.data).map((key) => ({
     id: key,
@@ -24,4 +30,27 @@ export async function fetchExpenses() {
     date: new Date(response.data[key].date),
     description: response.data[key].description,
   }));
+}
+
+export async function dbUpdate(id, expenseData) {
+  console.log(`[dbUpdate] id: ${id} expenseData: ${JSON.stringify(expenseData)}`);
+  let updated;
+  try {
+    const updateUrl = `${BACKEND_URL}/expenses/${id}.json`;
+    updated = axios.put(updateUrl, expenseData);
+  } catch (err) {
+    console.log(`[dbUpdate] error: ${err.message}`);
+  }
+  return updated;
+}
+
+export async function dbDelete(id) {
+  const deleteUrl = `${BACKEND_URL}/expenses/${id}.json`;
+  let deleted;
+  try {
+    deleted = axios.delete(deleteUrl);
+  } catch (err) {
+    console.log(`[dbDelete] error: ${err.message}`);
+  }
+  return deleted;
 }

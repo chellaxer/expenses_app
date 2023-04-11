@@ -5,13 +5,13 @@ import {
 import ExpensesOutput from '../components/ExpensesOutput/ExpensesOutput';
 import { ExpensesContext } from '../store/expenses-context';
 import { getDateMinusDays } from '../util/date';
-import { fetchExpenses } from '../util/http';
+import { dbFetch } from '../util/http';
 
 function RecentExpenses() {
   const { expenses, setExpenses } = useContext(ExpensesContext);
   useEffect(() => {
     async function getExpenses() {
-      const fetchedExpenses = await fetchExpenses();
+      const fetchedExpenses = await dbFetch();
       setExpenses(fetchedExpenses);
     }
     getExpenses().catch((err) => console.log(`[RecentExpenses] [getExpenses] error: ${err.message}`));
