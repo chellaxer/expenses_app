@@ -34,12 +34,17 @@ function RecentExpenses() {
   }, []);
 
   if (error) {
-    return <ErrorOverlay onConfirm={onConfirmHandler} />;
+    return (
+      <ErrorOverlay
+        message={error}
+        onConfirm={onConfirmHandler}
+      />
+    );
   }
   if (isFetching) {
     return <LoadingOverlay />;
   }
-  console.log(`[RecentExpenses] expenses: ${JSON.stringify(expenses)}`);
+  // console.log(`[RecentExpenses] expenses: ${JSON.stringify(expenses)}`);
   const recentExpenses = expenses.filter((expense) => {
     const today = new Date();
     const dateMinus7Days = getDateMinusDays(today, 7);

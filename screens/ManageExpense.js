@@ -17,6 +17,7 @@ import {
   dbDelete,
 } from '../util/http';
 import LoadingOverlay from '../components/UI/LoadingOverlay';
+import ErrorOverlay from '../components/UI/ErrorOverlay';
 
 const styles = StyleSheet.create({
   expenseItem: {
@@ -63,37 +64,65 @@ function ManageExpenses({ route, navigation }) {
   const selectedExpense = expenses.find(
     (expense) => expense.id === editingExpenseId,
   );
+  const errorHandler = () => {
+    setError(null);
+    setIsSubmitting(false);
+    navigation.goBack();
+  };
   useLayoutEffect(() => navigation.setOptions({
     title: isEditing ? 'Edit Expense' : 'Add Expense',
   }), [navigation, isEditing]);
   const confirmHandler = async (expenseData) => {
     setIsSubmitting(true);
+    let handled;
     if (isEditing) {
       // eslint-disable-next-line react/destructuring-assignment
-      updateExpense(editingExpenseId, expenseData);
-      await dbUpdate(editingExpenseId, expenseData);
+      handled = await dbUpdate(editingExpenseId, expenseData);
+      console.log(`[ManageExpenses] updated: ${JSON.stringify(handled?.error)}`);
+      if (!handled?.error) {
+        updateExpense(editingExpenseId, expenseData);
+      }
     } else {
-      const id = await dbStore(expenseData);
+      handled = await dbStore(expenseData);
       // eslint-disable-next-line react/destructuring-assignment
-      // expenseCtx.addExpense(expenseData);
-      addExpense({ ...expenseData, id });
+      // expenseCtx.addExpense(expenseDa
+      if (!handled?.error && handled?.data?.name) {
+        addExpense({ ...expenseData, id: handled.data.name });
+      }
     }
     setIsSubmitting(false);
-    navigation.goBack();
+    if (handled?.error) {
+      setError(handled.error);
+    } else {
+      navigation.goBack();
+    }
   };
 
   const deleteExpenseHandler = async () => {
     // eslint-disable-next-line react/destructuring-assignment
     setIsSubmitting(true);
-    deleteExpense(editingExpenseId);
-    await dbDelete(editingExpenseId);
-    setIsSubmitting(false);
-    navigation.goBack();
+    const del = await dbDelete(editingExpenseId);
+    if (del?.error) {
+      setError(del.error);
+      setIsSubmitting(false);
+    } else {
+      deleteExpense(editingExpenseId);
+      setIsSubmitting(false);
+      navigation.goBack();
+    }
   };
   const cancelHandler = () => {
     // console.log('[ManageExpenses] cancelHandler... ');
     navigation.goBack();
   };
+  if (error && !isSubmitting) {
+    return (
+      <ErrorOverlay
+        message={error}
+        onConfirm={errorHandler}
+      />
+    );
+  }
   if (isSubmitting) {
     return <LoadingOverlay />;
   }
