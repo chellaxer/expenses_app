@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
 });
 function ManageExpenses({ route, navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const editingExpenseId = route.params?.id ?? '';
   const expenseCtx = useContext(ExpensesContext);
   // console.log(`[ManageExpenses] editingExpenseId: ${editingExpenseId}`);
